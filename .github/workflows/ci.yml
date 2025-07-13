@@ -50,7 +50,7 @@ jobs:
     - name: Commit and Push updated Helm values.yaml
       run: |
         git config --global user.email "bharathg1252001@gmail.com"
-        git config --global user.name "Bharath G"
+        git config --global user.name "Bharath1252001"
         git add helm-chart/values.yaml
         git commit -m "Update tag in Helm chart to ${{ github.run_id }}"
         git push
