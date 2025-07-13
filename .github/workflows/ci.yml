@@ -1,4 +1,3 @@
-
 name: CI/CD
 
 on:
@@ -52,5 +51,28 @@ jobs:
         git config --global user.email "bharathg1252001@gmail.com"
         git config --global user.name "Bharath1252001"
         git add helm-chart/values.yaml
-        git commit -m "Update tag in Helm chart to ${{ github.run_id }}[skip ci]"
-        git push
+        git commit -m "Update tag in Helm chart to ${{ github.run_id }} [skip ci]"
+        git push https://x-access-token:${{ secrets.TOKEN }}@github.com/Bharath1252001/demo.git HEAD:main
+
+  helm-upgrade:
+    runs-on: ubuntu-latest
+    needs: update-helm-tag
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.TOKEN }}
+
+    - name: Configure kubectl for EKS
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name demo-cluster
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'latest'
+
+    - name: Helm Upgrade to Ensure Pods Running
+      run: |
+        helm upgrade demo-app ./helm-chart --install --namespace default
